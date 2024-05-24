@@ -4,6 +4,8 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { prisma } from 'src/lib/prisma'
 import { z } from 'zod'
 
+import { BadRequestError } from '../_errors/bad-request-error'
+
 export async function createAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
     '/users',
@@ -26,9 +28,7 @@ export async function createAccount(app: FastifyInstance) {
       })
 
       if (userWithSameEmail) {
-        return reply
-          .status(400)
-          .send({ message: 'user with same e-mail already exists.' })
+        throw new BadRequestError('User with same e-mail already exists.')
       }
 
       const [, domain] = email.split('@')
